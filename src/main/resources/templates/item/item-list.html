@@ -57,6 +57,7 @@
 								<label for="code" class="control-label col-sm-2">商品名</label>
 								<div class="col-sm-9">
 									<input type="text" name="searchName" id="searchName" class="form-control input-sm" th:field="*{searchName}"/>
+									<input type="hidden" name="sort" th:value="*{sort}">
 								</div>
 							</div>
 							<div class="text-center">
@@ -70,10 +71,38 @@
 		</div>
 
 		<!-- 並び替え機能 -->
-		<!-- <div>
-			<a th:href="@{/}">価格安い順</a>
-			<a th:href="@{}">価格高い順</a>
-		</div> -->
+		 <div>
+			<a th:href="@{/item-list/sort-cheap(searchName=${searchName},currentPageNum=${currentPageNum})}">価格安い順</a>
+			<a th:href="@{/item-list/sort-expensive(searchName=${searchName},currentPageNum=${currentPageNum})}">価格高い順</a>
+		</div> 
+
+		<table border="0">
+			<tr>
+				<td width="70">
+					<span th:if="${currentPageNum} != 1">
+						<a href="/firstPage" th:href="@{/item-list/firstPage(searchName=${searchName},sort=${sort},currentPageNum=${currentPageNum})}">先頭へ</a>
+					</span>
+				</td>
+				<td width="50">
+					<span th:if="${currentPageNum} != 1">
+						<a href="/backPage" th:href="@{/item-list/backPage(searchName=${searchName},sort=${sort},currentPageNum=${currentPageNum})}">前へ</a>
+					</span>
+				</td>
+				<td width="50">
+					<span th:text="${currentPageNum}"></span>&nbsp;/&nbsp;<span th:text="${allPageNum}"></span>
+				</td>
+				<td width="50">
+					<span th:if="${currentPageNum} != ${allPageNum}">
+						<a href="/nextPage" th:href="@{/item-list/nextPage(searchName=${searchName},sort=${sort},currentPageNum=${currentPageNum})}">次へ</a>
+					</span>
+				</td>
+				<td width="70">
+					<span th:if="${currentPageNum} != ${allPageNum}">
+						<a href="/lastPage" th:href="@{/item-list/lastPage(searchName=${searchName},sort=${sort},currentPageNum=${currentPageNum})}">最後へ</a>
+					</span>
+				</td>
+			</tr>
+		</table>
 
 		<!-- table -->
 		<div class="row">

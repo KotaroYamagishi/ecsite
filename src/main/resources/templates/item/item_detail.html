@@ -70,13 +70,13 @@
 									</div>
 									<div class="col-sm-12">
 										<label class="radio-inline">
-											<input type="radio" name="price" th:value="${item.priceM}" checked="checked">
-											<span class="price">&nbsp;М&nbsp;</span>&nbsp;&nbsp;<span
+											<input type="radio" class="size-box" name="price" th:value="M" checked="checked">
+											<span class="price">&nbsp;М&nbsp;</span>&nbsp;&nbsp;<span class="sizeM-price"
 												th:text="${item.priceM}"></span>円(税抜)
 										</label>
 										<label class="radio-inline">
-											<input type="radio" name="price" th:value="${item.priceL}">
-											<span class="price">&nbsp;Ｌ</span>&nbsp;&nbsp;<span
+											<input type="radio" class="size-box" name="price" th:value="L">
+											<span class="price">&nbsp;Ｌ</span>&nbsp;&nbsp;<span class="sizeL-price"
 												th:text="${item.priceL}"></span>円(税抜)
 										</label>
 									</div>
@@ -98,7 +98,7 @@
 									<div class="col-sm-12">
 										<span th:each="topping:${item.toppingList}">
 											<label class="checkbox-inline">
-												<input type="checkbox" th:value="${topping.id}"
+												<input type="checkbox" class="topping-checkbox" th:value="${topping.id}"
 													th:text="${topping.name}" th:field="*{toppingList}">
 											</label>
 										</span>
@@ -113,9 +113,12 @@
 								<div class="row">
 									<div class="col-xs-5 col-sm-5">
 										<label for="">数量:</label>
-										<label class="control-label" style="color: red"
-											for="inputError">数量を選択してください</label> <select name="area"
-											class="form-control" th:field="*{quantity}">
+										<span th:if="${#fields.hasErrors('quantity')}" th:error="*{quantity}" style="color: red">
+											<label class="control-label" style="color: red"
+											for="inputError">数量を選択してください</label> 
+										</span>
+											<select name="area"
+											class="form-control quantity-selectbox" th:field="*{quantity}">
 											<option value="1">1</option>
 											<option value="2">2</option>
 											<option value="3">3</option>
@@ -138,7 +141,7 @@
 					<div class="row">
 						<div class="col-xs-offset-2 col-xs-10">
 							<div class="form-group">
-								<span id="total-price">この商品金額：38,000 円(税抜)</span>
+								<span>この商品金額：<span id="total-price">38,000 </span>円(税抜)</span>
 							</div>
 						</div>
 					</div>
@@ -159,6 +162,7 @@
 	</div>
 	<!-- end container -->
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script th:src="@{/js/item_detail.js}"></script>
 	<script src="../static/js/bootstrap.min.js"></script>
 </body>
 

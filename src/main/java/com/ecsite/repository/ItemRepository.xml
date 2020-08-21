@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecsite.repository.ItemRepository">
+    <select id="findAll" resultType="com.ecsite.domain.Item">
+        select * 
+        from items
+        where name like '%' || #{itemSearchForm.searchName} || '%' 
+        ORDER BY price_m ${itemSearchForm.sort}
+        <if test="pageable != null and pageable.pageSize > 0">
+          LIMIT #{pageable.pageSize} OFFSET #{pageable.offset}
+        </if>
+    </select>
+</mapper>

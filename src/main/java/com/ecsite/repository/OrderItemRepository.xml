@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecsite.repository.OrderItemRepository">
+    <select id="findByItemIdAndOrderIdAndSize" resultType="com.ecsite.domain.OrderItem">
+        select * from order_items where item_id=#{itemId} AND order_id=#{orderId} AND size=#{size}
+    </select>
+    <insert id="firstInsert" parameterType="com.ecsite.domain.OrderItem">
+        INSERT INTO order_items(item_id,order_id,quantity,size) values(#{itemId},#{orderId},#{quantity},#{size})
+    </insert>
+    <!-- サービスの時のため、order_toppingの中身も見てそこも同じなら -->
+    <!-- 同一商品がカートに追加された時のためにquantityを一つ増やすメソッド -->
+    <update id="quantityUpdate" parameterType="com.ecsite.domain.OrderItem">
+        UPDATE order_items SET quantity=#{quantity} WHERE item_id=#{itemId} AND order_id=#{orderId} AND size=#{size}
+    </update>
+    <!-- 一括で全部検索するsql文 -->
+    <!-- findOrdersByuserId(userid,status=0のorderid)を取得してorderitemの情報を取得する -->
+    <select id="findByOrderId" resultType="com.ecsite.domain.OrderItem">
+        select * from order_items where order_id=#{orderId}
+    </select>
+</mapper>

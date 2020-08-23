@@ -1,16 +1,15 @@
-package com.ecsite.domain;
+package com.ecsite.form;
 
 import lombok.Data;
 
 @Data
-public class User {
+public class InsertUserForm {
     
-    private Integer id;
     private String name;
     private String email;
     private String password;
     private String zipcode;
     private String address;
     private String telephone;
-
+    private String checkpassword;
 }

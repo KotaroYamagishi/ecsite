@@ -10,11 +10,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.stereotype.Repository;
 
 // repositoryの代わり
 @Mapper
-@Repository
 public interface ItemRepository{
 
     Collection<Item> findAll(
@@ -24,6 +22,4 @@ public interface ItemRepository{
     @Select("select * from items where id=#{id}")
     Item findById(Integer itemId);
 
-    @Select("select * from items where name LIKE %:searchName%")
-    List<Item> findBySearchName(@Param("searchName")String searchName);
 }

@@ -2,14 +2,14 @@ package com.ecsite.form;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
 @Data
 public class ItemDetailForm {
-   private Integer price;
+   private String size;
    private List<Integer> toppingList;
-   @NotBlank(message = "数量を選択してください")
+   @NotNull(message = "数量を選択してください")
    private Integer quantity; 
 }

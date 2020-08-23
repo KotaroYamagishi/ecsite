@@ -25,9 +25,10 @@ public class ItemDetailController {
     private ToppingService toppingService;
 
     @ModelAttribute
-    public ItemDetailForm setUpForm(){
-        return new  ItemDetailForm();
-    }
+	public ItemDetailForm setUpForm() {
+		return new ItemDetailForm();
+	}
+
 
     @RequestMapping("/showDetail")
     public String itemDetail(Model model,String itemId){
@@ -38,9 +39,4 @@ public class ItemDetailController {
         return "item/item_detail";
     }
 
-    //　値を確認する用
-    @RequestMapping("/add-cart")
-    public String addCart(ItemDetailForm form){
-        return "cart_list";
-    }
 }

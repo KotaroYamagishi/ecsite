@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecsite.repository.OrderToppingRepository">
+    <insert id="insert" parameterType="com.ecsite.domain.OrderTopping">
+        INSERT INTO order_toppings(topping_id,order_item_id) VALUES(#{toppingId},#{orderItemId})
+    </insert>
+    <!-- order_item_idをもとにordertoppingテーブルの情報を取得（list） -->
+    <select id="findByOrderItemId" resultType="com.ecsite.domain.OrderTopping">
+        SELECT * FROM order_toppings WHERE orderItemId=#{orderItemId}
+    </select>
+</mapper>

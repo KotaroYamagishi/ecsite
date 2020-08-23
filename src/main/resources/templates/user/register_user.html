@@ -45,57 +45,74 @@
 		<div class="row">
 			<div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-10 col-xs-12">
 				<div class="well">
-					<form method="post" action="item_list_pizza.html">
+					<form method="post" th:action="@{toInsert/user-insert}" th:object="${insertUserForm}">
 						<fieldset>
 							<legend>ユーザ登録</legend>
 							<div class="form-group">
-								<label for="inputName">名前:</label><label
+								<label for="inputName">名前:</label>
+								<span th:field="${#field.hasErrors('name')}" th:errors="*{name}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">名前を入力してください</label>
+								</span>
 								<input type="text" id="inputName" class="form-control"
-									placeholder="Name">
+									placeholder="Name" th:field="*{name}">
 							</div>
 							<div class="form-group">
-								<label for="inputEmail">メールアドレス:</label><label
+								<div th:text="${errorMessage}"></div>
+								<label for="inputEmail">メールアドレス:</label>
+								<span th:field="${#field.hasErrors('email')}" th:errors="*{email}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">メールアドレスを入力してください</label>
-								<input type="text" id="inputEmail" class="form-control"
-									placeholder="Email">
+								</span>
+									<input type="text" id="inputEmail" class="form-control"
+									placeholder="Email" th:field="*{email}">
 							</div>
 							<div class="form-group">
 								<label for="inputZipcode">郵便番号:</label>
-								<label
+								<span th:field="${#field.hasErrors('zipcode')}" th:errors="*{zipcode}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">郵便番号を入力してください</label>
+								</span>
 									<input type="button" value="住所検索">
 								<input type="text" id="inputZipcode" class="form-control"
-									placeholder="Zipcode">
+									placeholder="Zipcode" th:field="*{zipcode}">
 								
 							</div>
 							<div class="form-group">
 								<label for="inputAddress">住所:</label>
-								<label
+								<span th:field="${#field.hasErrors('address')}" th:errors="*{address}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">住所を入力してください</label>
+								</span>
 								<input type="text" id="inputAddress" class="form-control"
-									placeholder="Address">
+									placeholder="Address" th:field="*{address}">
 							</div>
 							<div class="form-group">
 								<label for="inputTel">電話番号:</label>
-								<label
+								<span th:field="${#field.hasErrors('telephone')}" th:errors="*{telephone}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">電話番号を入力してください</label>
+								</span>
 								<input type="text" id="inputTel" class="form-control"
-									placeholder="Tel">
+									placeholder="Tel" th:field=*{telephone}>
 							</div>
 							<div class="form-group">
 								<label for="inputPassword">パスワード:</label>
-								<label
+								<span th:field="${#field.hasErrors('password')}" th:errors="*{password}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">パスワードを入力してください</label>
+								</span>
 								<input type="text" id="inputPassword" class="form-control"
-									placeholder="Password">
+									placeholder="Password" th:field="*{password}">
 							</div>
 							<div class="form-group">
 								<label for="inputConfirmationPassword">確認用パスワード:</label>
-								<label
+								<span th:field="${#field.hasErrors('checkpassword')}" th:errors="*{checkpassword}" style="color: red">
+									<label
 									class="control-label" style="color: red" for="inputError">確認用パスワードを入力してください</label>
+								</span>
 								<input type="text" id="inputConfirmationPassword" class="form-control"
-									placeholder="Confirmation Password">
+									placeholder="Confirmation Password" th:field=*{checkpassword}>
 							</div>
 							<div class="form-group">
 								<button type="submit" class="btn btn-primary">登録</button>

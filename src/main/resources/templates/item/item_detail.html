@@ -41,7 +41,7 @@
 		</nav>
 
 		<!-- 商品詳細フォーム -->
-		<form action="cart_list.html" th:action="@{/item-detail/add-cart}"method="post" th:object="${itemDetailForm}">
+		<form th:action="@{/shoppingcart/addCart}" method="post" th:object="${itemDetailForm}">
 			<div class="row">
 				<div class="col-xs-offset-2 col-xs-8">
 
@@ -70,12 +70,12 @@
 									</div>
 									<div class="col-sm-12">
 										<label class="radio-inline">
-											<input type="radio" class="size-box" name="price" th:value="M" checked="checked">
+											<input type="radio" class="size-box" name="size" th:value="M" checked="checked">
 											<span class="price">&nbsp;М&nbsp;</span>&nbsp;&nbsp;<span class="sizeM-price"
 												th:text="${item.priceM}"></span>円(税抜)
 										</label>
 										<label class="radio-inline">
-											<input type="radio" class="size-box" name="price" th:value="L">
+											<input type="radio" class="size-box" name="size" th:value="L">
 											<span class="price">&nbsp;Ｌ</span>&nbsp;&nbsp;<span class="sizeL-price"
 												th:text="${item.priceL}"></span>円(税抜)
 										</label>
@@ -113,7 +113,7 @@
 								<div class="row">
 									<div class="col-xs-5 col-sm-5">
 										<label for="">数量:</label>
-										<span th:if="${#fields.hasErrors('quantity')}" th:error="*{quantity}" style="color: red">
+										<span th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" style="color:red">
 											<label class="control-label" style="color: red"
 											for="inputError">数量を選択してください</label> 
 										</span>

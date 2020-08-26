@@ -17,7 +17,8 @@ $(function(){
             price=$(".sizeL-price").text();
             toppingPrice=300*topping_quantity;
         }
-        var totalPrice=(price*quantity)+toppingPrice;
+        var totalPrice=(Number(price)+toppingPrice)*quantity;
+        $(".total-price").val(totalPrice);
         $("#total-price").text(totalPrice);
     });
 })

@@ -42,6 +42,7 @@
 
 		<!-- 商品詳細フォーム -->
 		<form th:action="@{/shoppingcart/addCart}" method="post" th:object="${itemDetailForm}">
+			<input type="hidden" name="id" th:value="${item.id}">
 			<div class="row">
 				<div class="col-xs-offset-2 col-xs-8">
 
@@ -142,6 +143,7 @@
 						<div class="col-xs-offset-2 col-xs-10">
 							<div class="form-group">
 								<span>この商品金額：<span id="total-price">38,000 </span>円(税抜)</span>
+								<input type="hidden" class="total-price" name="totalPrice">
 							</div>
 						</div>
 					</div>

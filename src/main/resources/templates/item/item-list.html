@@ -33,6 +33,7 @@
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<p class="navbar-text navbar-right">
+						<span th:text="${session.user.name}+'様がログイン中'"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 						<a th:href="@{/shoppingcart}" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
 						<a href="order_history.html" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
 						<a th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;

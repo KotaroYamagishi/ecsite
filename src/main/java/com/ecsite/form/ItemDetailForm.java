@@ -8,8 +8,10 @@ import lombok.Data;
 
 @Data
 public class ItemDetailForm {
-   private String size;
+   private String id;
+   private Character size;
    private List<Integer> toppingList;
    @NotNull(message = "数量を選択してください")
-   private Integer quantity; 
+   private String quantity; 
+   private String totalPrice;
 }

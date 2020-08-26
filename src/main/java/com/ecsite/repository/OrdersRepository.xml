@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ecsite.repository.OrdersRepository">
+
+    <resultMap id="sssMap" type="com.ecsite.domain.Order">
+        <id column="orderid" property="id"></id>
+        <result column="userid" property="userId"></result>
+        <result column="status" property="status"></result>
+        <result column="totalprice" property="totalPrice"></result>
+        <result column="orderdate" property="orderDate"></result>
+        <result column="destinationname" property="destinationName"></result>
+        <result column="destinationemail" property="destinationEmail"></result>
+        <result column="destinationzipcode" property="destinationZipcode"></result>
+        <result column="destinationaddress" property="destinationAddress"></result>
+        <result column="destinationtel" property="destinationTel"></result>
+        <result column="deliverytime" property="deliveryTime"></result>
+        <result column="paymentmethod" property="paymentMethod"></result>
+        <collection property="orderItemList" ofType="com.ecsite.domain.OrderItem">
+            <result column="orderitemid" property="id"></result>
+            <result column="itemid" property="itemId"></result>
+            <result column="iorderid" property="orderId"></result>
+            <result column="quantity" property="quantity"></result>
+            <result column="size" property="size"></result>
+            <collection property="orderToppingList" ofType="com.ecsite.domain.OrderTopping">
+                <result column="ordertoppingid" property="id"></result>
+                <result column="toppingid" property="toppingId"></result>
+                <result column="torderitemid" property="orderItemId"></result>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- orders,order-item,order-toppingの情報をまとめて取得するクエリ -->
+    <select resultMap="sssMap" id="findOrdersAndOrderItemAndOrderTopping">
+        select o.id as orderid
+        ,o.user_id as userid
+        ,o.status as status
+        ,o.total_price as totalprice
+        ,o.order_date as orderdate
+        ,o.destination_name as destinationname
+        ,o.destination_email as destinationemail
+        ,o.destination_zipcode as destinationzipcode
+        ,o.destination_address as destinationaddress
+        ,o.destination_tel as destinationtel
+        ,o.delivery_time as deliverytime
+        ,o.payment_method as paymentmethod
+        ,i.id as orderitemid
+        ,i.item_id as itemid
+        ,i.order_id as iorderid
+        ,i.quantity as quantity
+        ,i.size as size
+        ,t.id as ordertoppingid
+        ,t.topping_id as toppingid
+        ,t.order_item_id as torderitemid 
+    from orders as o left join order_items as i on o.id=i.order_id left join order_toppings as t on i.id=t.order_item_id where o.user_id=#{userId} and o.status=#{status}
+    </select>
+
+    <!-- 戻り値として、自動採番したorderIdを取得する -->
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO orders(user_id,status,total_price) values(#{userId},#{status},#{totalPrice})
+    </insert>
+    <!-- カートに商品を追加した時にtotalpriceをupdateするメソッド -->
+    <update id="totalPriceUpdate" parameterType="com.ecsite.domain.Order">
+        UPDATE orders SET total_price=#{totalPrice} WHERE user_id=#{userId} AND status=#{status}
+    </update>
+    <!-- 注文する時のメソッド -->
+    <update id="applyOrder" parameterType="com.ecsite.domain.Order">
+        UPDATE orders SET status=#{status}
+        ,order_date=#{order.orderDate}
+        ,destination_name=#{order.destinationName}
+        ,destination_email=#{order.destinationEmail}
+        ,destination_zipcode=#{order.destinationZipcode}
+        ,destination_address=#{order.destinationAddress}
+        ,destination_tel=#{order.destinationTel}
+        ,delivery_time=#{order.deliveryTime}
+        ,payment_method=#{order.paymentMethod}
+        WHERE user_id=#{order.userId} AND status=#{order.status}
+    </update>
+    <!-- useridをもとにユーザーがそのアカウントで既にshoppingcartに商品を入れているかを確認するメソッド -->
+    <select id="findOrdersByuserId" resultType="com.ecsite.domain.Order">
+        SELECT * FROM orders WHERE user_id=#{userId} AND status=#{status}
+    </select>
+
+</mapper>

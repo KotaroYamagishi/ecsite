@@ -19,4 +19,8 @@ public class ToppingService {
     public List<Topping> findAll(){
         return toppingRepository.findAll();
     }
+
+    public Topping findById(Integer id){
+        return toppingRepository.findById(id);
+    }
 }

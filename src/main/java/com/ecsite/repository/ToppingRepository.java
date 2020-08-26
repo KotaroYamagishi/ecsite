@@ -12,4 +12,7 @@ public interface ToppingRepository {
 
     @Select("select * from toppings order by id")
     List<Topping> findAll();
+
+    @Select("select * from toppings where id=#{id}")
+    Topping findById(int id);
 }

@@ -52,6 +52,6 @@ public class InsertUserController {
             return "user/register_user";
         }
         userService.create(user);
-        return "user/login";
+        return "forward:/toLogin";
     }
 }

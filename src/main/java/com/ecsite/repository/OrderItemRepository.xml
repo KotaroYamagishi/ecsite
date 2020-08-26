@@ -4,7 +4,7 @@
     <select id="findByItemIdAndOrderIdAndSize" resultType="com.ecsite.domain.OrderItem">
         select * from order_items where item_id=#{itemId} AND order_id=#{orderId} AND size=#{size}
     </select>
-    <insert id="firstInsert" parameterType="com.ecsite.domain.OrderItem">
+    <insert id="firstInsert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO order_items(item_id,order_id,quantity,size) values(#{itemId},#{orderId},#{quantity},#{size})
     </insert>
     <!-- サービスの時のため、order_toppingの中身も見てそこも同じなら -->

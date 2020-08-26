@@ -7,7 +7,7 @@ import com.ecsite.domain.Order;
 import com.ecsite.domain.OrderItem;
 import com.ecsite.domain.OrderTopping;
 import com.ecsite.repository.OrderItemRepository;
-import com.ecsite.repository.OrderToppingReposioty;
+import com.ecsite.repository.OrderToppingRepository;
 import com.ecsite.repository.OrdersRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class ShoppingCartService {
     private OrderItemRepository orderItemRepository;
 
     @Autowired
-    private OrderToppingReposioty orderToppingReposioty;
+    private OrderToppingRepository orderToppingRepository;
 
     // orderにはuserId,status,totalPrice
     // orderItemにはitemId,quantity,size,初回insert時はorderのinsert時に取得する自動採番の値をorderIdにsetする
@@ -34,8 +34,8 @@ public class ShoppingCartService {
         Order findOrder=ordersRepository.findOrdersByuserId(order);
         if(Objects.isNull(findOrder)){
             // 初回のinsert
-            Integer orderId=ordersRepository.insert(order);
-            orderItem.setOrderId(orderId);
+            ordersRepository.insert(order);
+            orderItem.setOrderId(order.getId());
             orderItemAndOrderItemToppingFirstInsert(orderItem);
         }else{
             // 2回目以降のinsert
@@ -50,7 +50,7 @@ public class ShoppingCartService {
             if(Objects.isNull(findOrderItem)){
                 orderItemAndOrderItemToppingFirstInsert(orderItem);
             }else{
-                List<OrderTopping> orderToppingList= (List<OrderTopping>) orderToppingReposioty
+                List<OrderTopping> orderToppingList= (List<OrderTopping>) orderToppingRepository
                         .findByOrderItemId(findOrderItem.getId());
                 // 1回目のinsertとして処理
                 if(Objects.isNull(orderToppingList)){
@@ -64,13 +64,25 @@ public class ShoppingCartService {
         }
     }
 
+    public Order findOrdersAndOrderItemAndOrderTopping(Order order) {
+        return ordersRepository.findOrdersAndOrderItemAndOrderTopping(order);
+    }
+
+    public void applyOrder(Order order,Integer status){
+        ordersRepository.applyOrder(order,status);
+    }
+
     
 
     private void orderItemAndOrderItemToppingFirstInsert(OrderItem orderItem){
         orderItemRepository.firstInsert(orderItem);
-            if(!(Objects.isNull(orderItem.getOrderToppingList()))){
+        Integer orderItemId=orderItem.getId();
+            if((Objects.nonNull(orderItem.getOrderToppingList()))){
                 List<OrderTopping> orderToppingList=orderItem.getOrderToppingList();
-                orderToppingList.forEach(orderTopping ->orderToppingReposioty.insert(orderTopping));
+                orderToppingList.forEach(orderTopping ->{
+                    orderTopping.setOrderItemId(orderItemId);
+                    orderToppingRepository.insert(orderTopping);
+                });
             }
     }
 }

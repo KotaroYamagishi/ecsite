@@ -5,6 +5,15 @@ spring:
     username: postgres
     password: postgres
 
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: koutannn772@gmail.com
+    password: olmxlorezyaazswl
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.starttls.enable: true
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

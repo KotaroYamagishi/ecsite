@@ -14,6 +14,7 @@ public class Order {
     private Integer status;
     private Integer totalPrice;
     // 注文日
+    private String formatOrderDate;
     private Date orderDate;
     private String destinationName;
     private String destinationEmail;

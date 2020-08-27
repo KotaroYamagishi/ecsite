@@ -7,6 +7,7 @@ import com.ecsite.domain.Topping;
 import com.ecsite.form.ItemDetailForm;
 import com.ecsite.service.ItemService;
 import com.ecsite.service.ToppingService;
+import com.ecsite.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,9 @@ public class ItemDetailController {
     @Autowired
     private ToppingService toppingService;
 
+    @Autowired
+    private UserService userService;
+
     @ModelAttribute
 	public ItemDetailForm setUpForm() {
 		return new ItemDetailForm();
@@ -36,6 +40,8 @@ public class ItemDetailController {
         List<Topping> toppingList=toppingService.findAll();
         item.setToppingList(toppingList);
         model.addAttribute("item",item);
+        // ユーザーがログインしているかどうか
+        userService.isLogin(model);
         return "item/item_detail";
     }
 

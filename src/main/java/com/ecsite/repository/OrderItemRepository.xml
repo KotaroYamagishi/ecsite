@@ -12,9 +12,18 @@
     <update id="quantityUpdate" parameterType="com.ecsite.domain.OrderItem">
         UPDATE order_items SET quantity=#{quantity} WHERE item_id=#{itemId} AND order_id=#{orderId} AND size=#{size}
     </update>
+    <update id="orderIdUpdate">
+        UPDATE order_items SET order_id=#{orderId} WHERE id=#{id}
+    </update>
     <!-- 一括で全部検索するsql文 -->
     <!-- findOrdersByuserId(userid,status=0のorderid)を取得してorderitemの情報を取得する -->
     <select id="findByOrderId" resultType="com.ecsite.domain.OrderItem">
         select * from order_items where order_id=#{orderId}
+    </select>
+    <delete id="delete">
+        DELETE FROM order_items WHERE id=#{Id};
+    </delete>
+    <select id="findById" resultType="com.ecsite.domain.OrderItem">
+        SELECT * FROM order_items where id=#{id}
     </select>
 </mapper>

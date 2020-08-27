@@ -34,10 +34,15 @@
 				<div class="collapse navbar-collapse"
 					id="bs-example-navbar-collapse-1">
 					<p class="navbar-text navbar-right">
-						<a href="cart_list.html" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
-						<a href="order_history.html" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
-						<a href="login.html" class="navbar-link">ログイン</a>&nbsp;&nbsp;
-						<a href="item_list_pizza.html" class="navbar-link">ログアウト</a>
+						<a th:href="@{/shoppingcart}" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
+						<a th:href="@{/shoppingcart-history}" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
+						<span th:unless="${user}">
+							<a th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;
+						</span>
+						<span th:if="${user}">
+							<span style="color:blue;font-color:white;">ログイン中</span>
+							<a th:href="@{/logout}" class="navbar-link">ログアウト</a>
+						</span>
 					</p>
 				</div>
 				<!-- /.navbar-collapse -->
@@ -63,10 +68,7 @@
 		<div class="row">
 			<div class="col-xs-offset-5 col-xs-2">
 				<div class="form-group">
-					<form action="order_finished.html">
-						<input class="form-control btn btn-warning btn-block"
-							type="submit" value="トップ画面を表示する">
-					</form>
+					<a th:href="@{/item-list}" class="form-control btn btn-warning btn-block">トップ画面を表示する</a>
 				</div>
 			</div>
 		</div>

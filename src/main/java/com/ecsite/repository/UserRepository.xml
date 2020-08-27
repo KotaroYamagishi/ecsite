@@ -10,4 +10,7 @@
     <insert id="insert" parameterType="com.ecsite.domain.User">
         INSERT INTO users(name,email,password,zipcode,address,telephone) VALUES(#{name},#{email},#{password},#{zipcode},#{address},#{telephone})
     </insert>
+    <delete id="delete">
+        DELETE FROM users WHERE id=#{id}
+    </delete>
 </mapper>

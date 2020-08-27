@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.ecsite.domain.Item;
 import com.ecsite.form.ItemSearchForm;
 import com.ecsite.service.ItemService;
+import com.ecsite.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
@@ -20,6 +21,9 @@ public class IndexController {
     
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private UserService userService;
 
     @ModelAttribute
     public ItemSearchForm setUpItemSearchForm(){
@@ -103,6 +107,7 @@ public class IndexController {
         return movePageInList(model, form);
     }
 
+    // searchFormに入っている情報をmodelにつめてitem-listを表示するメソッド
     private String movePageInList(Model model, ItemSearchForm searchForm){
         //現在ページ数, 総ページ数を設定
         model.addAttribute("searchName", searchForm.getSearchName());
@@ -114,6 +119,11 @@ public class IndexController {
         List<Item> itemList = itemService.findAll(searchForm, pageable);
         //ユーザーデータリストを更新
         model.addAttribute("itemList", itemList);
+        // ユーザーがログインしているかどうか
+        userService.isLogin(model);
+        // オートコンプリート機能
+        StringBuilder itemNameForAutocomplete=itemService.createItemNameForAutocomplete();
+        model.addAttribute("itemNameForAutocomplete", itemNameForAutocomplete);
         return "item/item-list";
     }
 

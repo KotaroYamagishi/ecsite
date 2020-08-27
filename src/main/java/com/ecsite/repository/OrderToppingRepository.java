@@ -12,5 +12,9 @@ public interface OrderToppingRepository {
     // 2回目以降のinsertで同じ商品があるかどうか確かめる時など
     Collection<OrderTopping> findByOrderItemId(Integer orderItemId);
 
+    OrderTopping findByOrderItemIdAndToppingId(OrderTopping orderTopping);
+
     void insert(OrderTopping orderTopping);
+
+    void delete(Integer orderItemId);
 }

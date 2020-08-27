@@ -53,7 +53,18 @@
         ,t.id as ordertoppingid
         ,t.topping_id as toppingid
         ,t.order_item_id as torderitemid 
-    from orders as o left join order_items as i on o.id=i.order_id left join order_toppings as t on i.id=t.order_item_id where o.user_id=#{userId} and o.status=#{status}
+    from orders as o left join order_items as i on o.id=i.order_id left join order_toppings as t on i.id=t.order_item_id 
+        <where>
+            <if test="userId!=null"> 
+            o.user_id=#{userId} 
+            </if>
+            <if test="status!=null">
+            and o.status=#{status}
+            </if>
+            <if test="status==null">
+            and o.status>=1
+            </if>
+        </where>
     </select>
 
     <!-- 戻り値として、自動採番したorderIdを取得する -->
@@ -66,20 +77,21 @@
     </update>
     <!-- 注文する時のメソッド -->
     <update id="applyOrder" parameterType="com.ecsite.domain.Order">
-        UPDATE orders SET status=#{status}
-        ,order_date=#{order.orderDate}
-        ,destination_name=#{order.destinationName}
-        ,destination_email=#{order.destinationEmail}
-        ,destination_zipcode=#{order.destinationZipcode}
-        ,destination_address=#{order.destinationAddress}
-        ,destination_tel=#{order.destinationTel}
-        ,delivery_time=#{order.deliveryTime}
-        ,payment_method=#{order.paymentMethod}
+        UPDATE orders SET status=#{status} ,order_date=#{order.orderDate} ,destination_name=#{order.destinationName} ,destination_email=#{order.destinationEmail} ,destination_zipcode=#{order.destinationZipcode} ,destination_address=#{order.destinationAddress} ,destination_tel=#{order.destinationTel} ,delivery_time=#{order.deliveryTime} ,payment_method=#{order.paymentMethod}
         WHERE user_id=#{order.userId} AND status=#{order.status}
+    </update>
+    <update id="updateUserId">
+        UPDATE orders SET user_id=#{userId} WHERE id=#{id}
     </update>
     <!-- useridをもとにユーザーがそのアカウントで既にshoppingcartに商品を入れているかを確認するメソッド -->
     <select id="findOrdersByuserId" resultType="com.ecsite.domain.Order">
         SELECT * FROM orders WHERE user_id=#{userId} AND status=#{status}
     </select>
+    <select id="findByIdAndStatus" resultType="com.ecsite.domain.Order">
+        select * from orders where id=#{id} AND status=#{status}
+    </select>
+    <delete id="delete">
+        DELETE FROM orders WHERE id=#{id};
+    </delete>
 
 </mapper>

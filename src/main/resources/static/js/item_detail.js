@@ -1,6 +1,7 @@
 $(function(){
     // 商品の値段
     var totalPrice=$(".sizeM-price").text();
+    $(".total-price").val(totalPrice);
     $("#total-price").text(totalPrice);
 
     // サイズが変更された時

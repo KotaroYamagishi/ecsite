@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<h2 style="margin-bottom: 20px;" th:inline="text">[[${name}]]様</h2>
+	<p>商品の一覧です。ご確認ください。</p>
+	<table style="margin: 10px 30px 0px 0px; padding: 0px; border: solid 1px #666; border-spacing: 0; font: small/1.5 Arial,Helvetica,sans-serif;">
+		<tr style="text-align: center;">
+			<td colspan="2" style="width: 20px;  background: #65ace4;color: #fff;padding: 3px 5px;border-bottom: solid 1px #666;border-right: solid 1px #fff;">お届け予定：</td>
+			<td style="width: 150px; background: #65ace4;color: #fff;padding: 3px 5px;border-bottom: solid 1px #666;border-right: solid 1px #fff;">お届け先：</td>
+        </tr>
+        <tbody th:each="order : ${orderList}">
+        <tr>
+            <td colspan="2" style="padding: 3px 5px;border-bottom: dotted 1px #666;text-align: center;border-right: solid 1px #000;"
+            th:text="${order.deliveryTime}"></td>
+		    <td style="padding: 3px 5px;border-bottom: dotted 1px #666;text-align: left;border-right: solid 1px #000;"
+		    th:text="${order.destinationName}"></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="width: 50px;  background: #65ace4;color: #fff;padding: 3px 5px;border-bottom: solid 1px #666;border-right: solid 1px #666;">配送オプション：</td>
+            <td style="padding: 3px 5px;border-bottom: dotted 1px #666;text-align: left;border-right: solid 1px #000;"
+		    th:text="${order.destinationZipcode}"></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding: 3px 5px;border-bottom: dotted 1px #666;text-align: left;border-right: solid 1px #000;">お届け日時指定便</td>
+            <tb style="padding: 3px 5px;border-bottom: dotted 1px #666;text-align: left;border-right: solid 1px #000;"
+		    th:text="${order.destinationAddress}"></tb>
+        </tr>
+        </tbody>
+    </table>
+    <div th:each="order : ${orderList}">
+    <div style="margin-top: 50px; font-size: 17px;">領収書/購入明細書</div>
+    <hr>
+    <span>注文日：</span>
+    <span th:text="${order.orderDate}"></span><br>
+    <div>小計：</div>
+    <span th:text="${order.totalPrice}">円</span>
+    <div>支払い方法</div>
+    <div th:switch="${order.paymentMethod}">
+        <p th:case="1">代金引換</p>
+        <p th:case="2">クレジットカード</p>
+    </div>
+    </div>
+</body>
+</html>

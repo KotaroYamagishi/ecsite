@@ -6,6 +6,12 @@
     </insert>
     <!-- order_item_idをもとにordertoppingテーブルの情報を取得（list） -->
     <select id="findByOrderItemId" resultType="com.ecsite.domain.OrderTopping">
-        SELECT * FROM order_toppings WHERE orderItemId=#{orderItemId}
+        SELECT * FROM order_toppings WHERE order_item_id=#{orderItemId}
     </select>
+    <select id="findByOrderItemIdAndToppingId" resultType="com.ecsite.domain.OrderTopping">
+        SELECT * FROM order_toppings WHERE order_item_id=#{orderItemId} AND topping_id=#{toppingId}
+    </select>
+    <delete id="delete">
+        DELETE FROM order_toppings WHERE order_item_id=#{orderItemId};
+    </delete>
 </mapper>

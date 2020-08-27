@@ -1,6 +1,8 @@
 package com.ecsite.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ecsite.domain.Item;
 import com.ecsite.form.ItemSearchForm;
@@ -45,7 +47,7 @@ public class ItemService {
                 //表示開始位置を返却
                 //例えば、1ページに2行表示する場合の、2ページ目の表示開始位置は
                 //(2-1)*2+1=3 で計算される
-                return ((pageNumber - 1) * Integer.parseInt(listPageSize) + 1);
+                return ((pageNumber - 1) * Integer.parseInt(listPageSize));
             }
             public Sort getSort() {
                 //ソートは使わないのでnullを返却
@@ -70,5 +72,18 @@ public class ItemService {
         return allPageNum == 0 ? 1 : allPageNum;
     }
 
-
+    public StringBuilder createItemNameForAutocomplete() {
+        List<Item> itemList = (List<Item>) itemRepository.findAll(new ItemSearchForm(), null);
+        List<String> originalItemNameList=itemList.stream().map(item->item.getName()).collect(Collectors.toList());
+        StringBuilder itemListForAutocomplete = new StringBuilder();
+		for (int i = 0; i < originalItemNameList.size(); i++) {
+			if (i != 0) {
+				itemListForAutocomplete.append(",");
+			}
+			itemListForAutocomplete.append("'");
+			itemListForAutocomplete.append(originalItemNameList.get(i));
+			itemListForAutocomplete.append("'");
+		}
+		return itemListForAutocomplete;
+    }
 }

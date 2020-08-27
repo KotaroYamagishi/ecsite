@@ -4,24 +4,25 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Random;
 
 import javax.servlet.http.HttpSession;
 
-import com.ecsite.domain.Item;
 import com.ecsite.domain.Order;
 import com.ecsite.domain.OrderItem;
 import com.ecsite.domain.OrderTopping;
-import com.ecsite.domain.Topping;
 import com.ecsite.domain.User;
 import com.ecsite.form.ItemDetailForm;
 import com.ecsite.form.OrderConfirmForm;
 import com.ecsite.service.ItemService;
+import com.ecsite.service.SendMailService;
 import com.ecsite.service.ShoppingCartService;
 import com.ecsite.service.ToppingService;
+import com.ecsite.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.thymeleaf.context.Context;
 
 @Controller
 @Validated
@@ -42,6 +44,10 @@ public class ShoppingCartController {
     private ItemService itemService;
     @Autowired
     private ToppingService toppingService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SendMailService sendMailService;
     @Autowired
     private HttpSession session;
 
@@ -89,7 +95,8 @@ public class ShoppingCartController {
     }
 
     @RequestMapping("/delete")
-    public String delete(Model model) {
+    public String delete(Model model, String orderItemId) {
+        shoppingCartService.deleteOrderItemsAndOrdertoppings(Integer.parseInt(orderItemId));
         Order order = setUserIdAndStatus0();
         showShoppingCart(order, model);
         return "shoppingcart/cart_list";
@@ -106,7 +113,7 @@ public class ShoppingCartController {
     @RequestMapping("/order")
     public String order(@Validated OrderConfirmForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return index(model);
+            return toOrder(model);
         }
         Timestamp orderTimestamp = setDateTime(form);
         Integer payMethod = Integer.parseInt(form.getPaymentMethod());
@@ -128,43 +135,48 @@ public class ShoppingCartController {
         }
         shoppingCartService.applyOrder(order, status);
 
+        Order sendMailOrder=new Order();
+        sendMailOrder.setUserId(order.getUserId());
+
+        List<Order> ordersList = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(sendMailOrder);
+        Collections.reverse(ordersList);
+		Order orderWhatBoughtLatest = ordersList.get(0);
+		Context context = new Context();
+
+        User user = (User) session.getAttribute("user");
+		context.setVariable("name", user.getName());
+		// context.setVariable("deliveryTime", ldtForMail);
+		context.setVariable("orderList", orderWhatBoughtLatest);
+
+		sendMailService.sendMail(context, order); 
+        // ユーザーがログインしているかどうか
+        userService.isLogin(model);
+        
         return "order/order_finished";
     }
 
     // shoppingcartの中身を表示する処理
     private void showShoppingCart(Order order, Model model) {
-        Order findOrder = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(order);
+        List<Order> findOrderList = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(order);
+        Order findOrder =new Order();
+        if(findOrderList.size()==0){
+            findOrder =null;
+        }else{
+            findOrder =findOrderList.get(0);
+        }
         if (Objects.isNull(findOrder)) {
+            model.addAttribute("emptyMessage", "ショッピングカートは空です");
+        } else if (Objects.nonNull(findOrder) && Objects.equals(findOrder.getTotalPrice(), 0)) {
+            User user= (User) session.getAttribute("user");
+            if(Objects.isNull(user.getName())){
+                session.removeAttribute("user");
+            }
+            shoppingCartService.deleteOrders(findOrder.getId());
             model.addAttribute("emptyMessage", "ショッピングカートは空です");
         } else {
             List<OrderItem> orderItemList = findOrder.getOrderItemList();
             orderItemList.forEach(orderItem -> {
-                Item item = itemService.findById(orderItem.getItemId());
-                orderItem.setItem(item);
-                Integer price = null;
-                Integer toppingQuantity = 0;
-                Integer toppingPrice = 0;
-                List<OrderTopping> orderToppingList = orderItem.getOrderToppingList();
-                if (Objects.nonNull(orderToppingList)) {
-                    toppingQuantity = orderToppingList.size();
-                    // orderToppingに情報を詰める
-                    orderToppingList.forEach(orderTopping -> {
-                        // thymeleafの中でサイズ別に値段を表示する
-                        Topping topping = toppingService.findById(orderTopping.getToppingId());
-                        orderTopping.setTopping(topping);
-                    });
-                }
-                if (Objects.equals(orderItem.getSize(), 'M')) {
-                    price = item.getPriceM();
-                    orderItem.setPrice(price);
-                    toppingPrice = 200 * toppingQuantity;
-                } else {
-                    price = item.getPriceL();
-                    orderItem.setPrice(price);
-                    toppingPrice = 300 * toppingQuantity;
-                }
-                Integer totalPrice = (price + toppingPrice) * orderItem.getQuantity();
-                orderItem.setTotalPrice(totalPrice);
+                shoppingCartService.orderItemSetItemAndTopping(orderItem);
             });
             // 消費税と税込合計金額を計算しmodelへ
             Integer totalPrice = findOrder.getTotalPrice();
@@ -174,6 +186,8 @@ public class ShoppingCartController {
             model.addAttribute("taxPrice", taxPrice);
             model.addAttribute("includingTaxTotalPrice", includingTaxTotalPrice);
         }
+        // ユーザーがログインしているかどうか
+        userService.isLogin(model);
     }
 
     // sessionに入ったuserIdとstatusに0をorderにsetするメソッド
@@ -181,12 +195,12 @@ public class ShoppingCartController {
     private Order setUserIdAndStatus0() {
         Order order = new Order();
         User user = (User) session.getAttribute("user");
-        //未ログインユーザーだった場合
+        // 未ログインユーザーだった場合
         if (Objects.isNull(user)) {
-            String id = UUID.randomUUID().toString().replaceAll("[^0-9]", "");
+            Random random = new Random();
+            Integer temporaryUserId = random.nextInt(10000000);
             user = new User();
-            user.setId(Integer.parseInt(id));
-            user.setName("ゲスト");
+            user.setId(temporaryUserId);
             session.setAttribute("user", user);
         }
         order.setUserId(user.getId());

@@ -34,10 +34,15 @@
 				<div class="collapse navbar-collapse"
 					id="bs-example-navbar-collapse-1">
 					<p class="navbar-text navbar-right">
-						<a href="cart_list.html" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
-						<a href="order_history.html" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
-						<a href="login.html" class="navbar-link">ログイン</a>&nbsp;&nbsp;
-						<a href="item_list_pizza.html" class="navbar-link">ログアウト</a>
+						<a th:href="@{/shoppingcart}" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
+						<a th:href="@{/shoppingcart-history}" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
+						<span th:unless="${user}">
+							<a th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;
+						</span>
+						<span th:if="${user}">
+							<span style="color:blue;font-color:white;">ログイン中</span>
+							<a th:href="@{/logout}" class="navbar-link">ログアウト</a>
+						</span>
 					</p>
 				</div>
 				<!-- /.navbar-collapse -->
@@ -121,6 +126,7 @@
 			</div>
 		</div>
 
+		<script src="https://ajaxzip3.github.io/ajaxzip3.js"></script>
 		<!-- table -->
 		<form th:action="@{/shoppingcart/order}" method="post" th:object="${orderConfirmForm}">
 			<div class="row">
@@ -136,6 +142,9 @@
 									</div>
 								</td>
 								<td>
+									<div class="col-sm-12">
+										<span th:if="${#fields.hasErrors('destinationName')}" th:errors="*{destinationName}" style="color: red"></span>
+									</div>
 									<input type="text" name="destinationName" th:value="${session.user.name}">
 								</td>
 							</tr>
@@ -146,6 +155,9 @@
 									</div>
 								</td>
 								<td>
+									<div class="col-sm-12">
+										<span th:if="${#fields.hasErrors('destinationEmail')}" th:errors="*{destinationEmail}" style="color: red"></span>
+									</div>
 									<input type="text" name="destinationEmail" th:value="${session.user.email}">
 								</td>
 							</tr>
@@ -156,7 +168,16 @@
 									</div>
 								</td>
 								<td>
-									<input type="text" name="destinationZipcode" th:value="${session.user.zipcode}">&nbsp;&nbsp;<button>住所検索</button>
+									<div class="col-sm-12">
+										<span th:if="${#fields.hasErrors('destinationZipcode')}" th:errors="*{destinationZipcode}" style="color: red"></span>
+									</div>
+									<input type="text" id="inputZipcode"
+									class="p-postal-code" size="8" maxlength="8"
+									placeholder="XXX-XXXX (-を入れて入力してください)" name="destinationZipcode"
+									th:value="${session.user.zipcode}">
+									&nbsp;&nbsp<input type="button" value="住所検索" size="8" maxlength="8"
+									onkeyup="AjaxZip3.zip2addr('destinationZipcode','','destinationAddress','destinationAddress');"
+									onclick="AjaxZip3.zip2addr('destinationZipcode','','destinationAddress','destinationAddress');">
 								</td>
 							</tr>
 							<tr>
@@ -166,7 +187,12 @@
 									</div>
 								</td>
 								<td>
-									<input type="text" name="destinationAddress" th:value="${session.user.address}">
+									<div class="col-sm-12">
+										<span th:if="${#fields.hasErrors('destinationAddress')}" th:errors="*{destinationAddress}" style="color: red"></span>
+									</div>
+									<input type="text" id="inputAddress"
+									class="form-control p-region p-locality p-street-address p-extended-address"
+									placeholder="東京都新宿区xxxx" name="destinationAddress" th:value="${session.user.address}">
 								</td>
 							</tr>
 							<tr>
@@ -176,6 +202,9 @@
 									</div>
 								</td>
 								<td>
+									<div class="col-sm-12">
+										<span th:if="${#fields.hasErrors('destinationTel')}" th:errors="*{destinationTel}" style="color: red"></span>
+									</div>
 									<input type="text" name="destinationTel" th:value="${session.user.telephone}">
 								</td>
 							</tr>
@@ -189,8 +218,7 @@
 									<div class="form-group">
 										<div class="row">
 											<div class="col-sm-12">
-												<label
-													class="control-label" style="color: red" for="inputPeriod">配達日時を入力してください</label>
+												<span th:if="${#fields.hasErrors('deliveryTime')}" th:errors="*{deliveryTime}" style="color: red"></span>
 											</div>
 											<div class="col-sm-5">
 												<input type="date" name="deliveryTime" id="deliveryTime"
@@ -312,7 +340,8 @@
 		</form>
 	</div>
 	<!-- end container -->
-	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="../static/js/bootstrap.min.js"></script>
 </body>
 </html>

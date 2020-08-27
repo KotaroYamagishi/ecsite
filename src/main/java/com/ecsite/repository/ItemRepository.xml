@@ -4,8 +4,10 @@
     <select id="findAll" resultType="com.ecsite.domain.Item">
         select * 
         from items
-        where name like '%' || #{itemSearchForm.searchName} || '%' 
+        where name like '%' || #{itemSearchForm.searchName} || '%'
+        <if test="itemSearchForm.sort!=null">
         ORDER BY price_m ${itemSearchForm.sort}
+        </if>
         <if test="pageable != null and pageable.pageSize > 0">
           LIMIT #{pageable.pageSize} OFFSET #{pageable.offset}
         </if>

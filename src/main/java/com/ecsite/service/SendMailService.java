@@ -22,7 +22,12 @@ public class SendMailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void sendMail(Context context, Order order){
+    
+	/** 
+	 * @param context
+	 * @param order
+	 */
+	public void sendMail(Context context, Order order){
 
 		// メールを送るためのメソッド
         javaMailSender.send(new MimeMessagePreparator() {
@@ -40,6 +45,12 @@ public class SendMailService {
 
     }
 
+	
+	/** 
+	 * @param templateName
+	 * @param context
+	 * @return String
+	 */
 	// メールの内容
     private String getMailBody(String templateName, Context context) {
 		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
@@ -47,6 +58,10 @@ public class SendMailService {
 		return templateEngine.process(templateName, context);
     }
 
+	
+	/** 
+	 * @return ClassLoaderTemplateResolver
+	 */
 	// htmlに書いてあるメール内容をメールで送信できる書式に変更する
 	private ClassLoaderTemplateResolver mailTemplateResolver() {
 		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();

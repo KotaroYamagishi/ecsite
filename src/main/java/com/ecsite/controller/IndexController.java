@@ -25,11 +25,22 @@ public class IndexController {
     @Autowired
     private UserService userService;
 
+    
+    /** 
+     * @return ItemSearchForm
+     */
     @ModelAttribute
     public ItemSearchForm setUpItemSearchForm(){
         return new ItemSearchForm();
     }
 
+    
+    /** 
+     * 初期表示
+     * 
+     * @param model
+     * @return String
+     */
     @RequestMapping("")
     public String index(Model model){
         ItemSearchForm form = new ItemSearchForm();
@@ -39,24 +50,61 @@ public class IndexController {
         return movePageInList(model,form);
     }
 
+    
+    /** 
+     * 商品検索時
+     * 
+     * @param form
+     * @param model
+     * @return String
+     */
     @RequestMapping("/search")
     public String itemSearch(ItemSearchForm form,Model model){
         form.setCurrentPageNum(1);
         return movePageInList(model,form);
     }
 
+    
+    /** 
+     * 価格の安い順に並び替え
+     * 
+     * @param form
+     * @param model
+     * @param searchName
+     * @param currentPageNum
+     * @return String
+     */
     @RequestMapping("/sort-cheap")
     public String itemSortCheap(ItemSearchForm form, Model model,String searchName,String currentPageNum){
         setSearchForm(form, searchName, "asc",currentPageNum);
         return movePageInList(model, form);
     }
 
+    
+    /** 
+     * 価格の高い順に並び替え
+     * @param form
+     * @param model
+     * @param searchName
+     * @param currentPageNum
+     * @return String
+     */
     @RequestMapping("/sort-expensive")
     public String itemSortExpensive(ItemSearchForm form, Model model,String searchName,String currentPageNum){
         setSearchForm(form, searchName, "desc",currentPageNum);
         return movePageInList(model, form);
     }
 
+    
+    /** 
+     * 先頭ページへ移動
+     * @param form
+     * @param model
+     * @param searchName
+     * @param sort
+     * @param currentPageNum
+     * @return String
+     */
     @RequestMapping("/firstPage")
     public String firstPage(ItemSearchForm form, Model model,String searchName,String sort,String currentPageNum){
         setSearchForm(form, searchName, sort,currentPageNum);
@@ -66,7 +114,7 @@ public class IndexController {
     }
  
     /**
-     * 一覧画面で「前へ」リンク押下時に次ページを表示する
+     * 一覧画面で「前へ」リンク押下時に一つ前のページを表示する
      * @param searchForm 検索用Formオブジェクト
      * @param model Modelオブジェクト
      * @return 一覧画面へのパス
@@ -107,6 +155,12 @@ public class IndexController {
         return movePageInList(model, form);
     }
 
+    
+    /** 
+     * @param model
+     * @param searchForm
+     * @return String
+     */
     // searchFormに入っている情報をmodelにつめてitem-listを表示するメソッド
     private String movePageInList(Model model, ItemSearchForm searchForm){
         //現在ページ数, 総ページ数を設定

@@ -21,6 +21,10 @@ public class InsertUserController {
     @Autowired
     private UserService userService;
 
+    
+    /** 
+     * @return InsertUserForm
+     */
     @ModelAttribute
     public InsertUserForm setUpItemSearchForm() {
         return new InsertUserForm();
@@ -28,11 +32,24 @@ public class InsertUserController {
 
     
 
+    
+    /** 
+     * 初期表示
+     * @return String
+     */
     @RequestMapping("")
     public String toInsert(){
         return "user/register_user";
     }
 
+    
+    /** 
+     * 新規会員登録する
+     * @param form
+     * @param result
+     * @param model
+     * @return String
+     */
     @RequestMapping("/user-insert")
     public String userInsert(@Validated InsertUserForm form,BindingResult result,Model model){
         if(result.hasErrors()){

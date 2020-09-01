@@ -19,6 +19,7 @@ import com.ecsite.domain.User;
 import com.ecsite.form.ItemDetailForm;
 import com.ecsite.form.OrderConfirmForm;
 import com.ecsite.service.ItemService;
+import com.ecsite.service.OrdersService;
 import com.ecsite.service.SendMailService;
 import com.ecsite.service.ShoppingCartService;
 import com.ecsite.service.ToppingService;
@@ -41,7 +42,7 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
     @Autowired
-    private ItemService itemService;
+    private OrdersService ordersService;
     @Autowired
     private ToppingService toppingService;
     @Autowired
@@ -51,16 +52,30 @@ public class ShoppingCartController {
     @Autowired
     private HttpSession session;
 
+    
+    /** 
+     * @return ItemDetailForm
+     */
     @ModelAttribute
     public ItemDetailForm setUpItemDetailForm() {
         return new ItemDetailForm();
     }
 
+    
+    /** 
+     * @return OrderConfirmForm
+     */
     @ModelAttribute
     public OrderConfirmForm setUpOrderConfirmForm() {
         return new OrderConfirmForm();
     }
 
+    
+    /** 
+     * 初期表示
+     * @param model
+     * @return String
+     */
     @RequestMapping("")
     public String index(Model model) {
         Order order = setUserIdAndStatus0();
@@ -68,7 +83,14 @@ public class ShoppingCartController {
         return "shoppingcart/cart_list";
     }
 
-    // 商品を追加し、ショッピングカートを表示する機能
+    
+    /** 
+     * 商品を追加し、ショッピングカートを表示する機能
+     * @param form
+     * @param result
+     * @param model
+     * @return String
+     */
     @RequestMapping("/addCart")
     public String addShoppingCart(@Validated ItemDetailForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -94,6 +116,13 @@ public class ShoppingCartController {
         return "shoppingcart/cart_list";
     }
 
+    
+    /** 
+     * 商品削除
+     * @param model
+     * @param orderItemId
+     * @return String
+     */
     @RequestMapping("/delete")
     public String delete(Model model, String orderItemId) {
         shoppingCartService.deleteOrderItemsAndOrdertoppings(Integer.parseInt(orderItemId));
@@ -102,20 +131,41 @@ public class ShoppingCartController {
         return "shoppingcart/cart_list";
     }
 
+    
+    /** 
+     * 注文確認画面表示
+     * @param model
+     * @return String
+     */
     @RequestMapping("/toOrder")
     public String toOrder(Model model) {
         Order order = setUserIdAndStatus0();
+        model.addAttribute("nowDate",new Date());
         showShoppingCart(order, model);
         // deliveryTimeに初期値を設定する（今の時間）
         return "order/order_confirm";
     }
 
+    
+    /** 
+     * 注文時
+     * @param form
+     * @param result
+     * @param model
+     * @return String
+     */
     @RequestMapping("/order")
     public String order(@Validated OrderConfirmForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return toOrder(model);
         }
+        Date nowDate=new Date();
         Timestamp orderTimestamp = setDateTime(form);
+        Date orderDate=new Date(orderTimestamp.getTime());
+        if(orderDate.before(nowDate)) {
+            model.addAttribute("errorMessage", "この時間は選択できません");
+            return toOrder(model);
+        }
         Integer payMethod = Integer.parseInt(form.getPaymentMethod());
         Order order = setUserIdAndStatus0();
         order.setDestinationName(form.getDestinationName());
@@ -125,7 +175,7 @@ public class ShoppingCartController {
         order.setDestinationTel(form.getDestinationTel());
         order.setDeliveryTime(orderTimestamp);
         order.setPaymentMethod(payMethod);
-        order.setOrderDate(new Date());
+        order.setOrderDate(nowDate);
         Integer status = null;
         // 支払い方法で入金済みか未入金か判断
         if (payMethod == 1) {
@@ -133,12 +183,12 @@ public class ShoppingCartController {
         } else if (payMethod == 2) {
             status = 2;
         }
-        shoppingCartService.applyOrder(order, status);
+        ordersService.applyOrder(order, status);
 
         Order sendMailOrder=new Order();
         sendMailOrder.setUserId(order.getUserId());
 
-        List<Order> ordersList = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(sendMailOrder);
+        List<Order> ordersList = ordersService.findOrdersAndOrderItemAndOrderTopping(sendMailOrder);
         Collections.reverse(ordersList);
 		Order orderWhatBoughtLatest = ordersList.get(0);
 		Context context = new Context();
@@ -155,9 +205,14 @@ public class ShoppingCartController {
         return "order/order_finished";
     }
 
-    // shoppingcartの中身を表示する処理
+    
+    /** 
+     * shoppingcartの中身を表示する処理
+     * @param order
+     * @param model
+     */
     private void showShoppingCart(Order order, Model model) {
-        List<Order> findOrderList = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(order);
+        List<Order> findOrderList = ordersService.findOrdersAndOrderItemAndOrderTopping(order);
         Order findOrder =new Order();
         if(findOrderList.size()==0){
             findOrder =null;
@@ -190,8 +245,11 @@ public class ShoppingCartController {
         userService.isLogin(model);
     }
 
-    // sessionに入ったuserIdとstatusに0をorderにsetするメソッド
-    // sessionにuserが入ってなかったら仮のidを発行してあげる必要あり
+    
+    /** 
+     * sessionに入ったuserIdとstatusに0をorderにsetするメソッド
+     * @return Order
+     */
     private Order setUserIdAndStatus0() {
         Order order = new Order();
         User user = (User) session.getAttribute("user");
@@ -208,7 +266,12 @@ public class ShoppingCartController {
         return order;
     }
 
-    // orderConfirmFormで受け取った日時をtimestamp型に変換するメソッド
+    
+    /** 
+     * orderConfirmFormで受け取った日時をtimestamp型に変換するメソッド
+     * @param form
+     * @return Timestamp
+     */
     private Timestamp setDateTime(OrderConfirmForm form) {
         String delivery = form.getDeliveryTime() + " " + form.getDelivaryTimeHour();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh");

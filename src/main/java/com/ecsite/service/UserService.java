@@ -26,20 +26,41 @@ public class UserService {
     @Autowired
     private HttpSession session;
 
+    
+    /** 
+     * @param user
+     */
     // 新規会員登録
     public void create(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.insert(user);
     }
+    
+    /** 
+     * @param email
+     * @return User
+     */
     // 同一メールアドレスがないかチェック
     public User findByEmail(String email){
         return userRepository.findByEmail(email);
     }
 
+    
+    /** 
+     * emailとpasswordをもとにuserを検索
+     * 
+     * @param user
+     * @return User
+     */
     public User findByEmailAndPassWord(User user){
         return userRepository.findByEmailAndPassWord(user);
     }
 
+    
+    /** 
+     * userがログインした時、modelにuserを詰める処理
+     * @param model
+     */
     public void isLogin(Model model){
         User user= (User) session.getAttribute("user");
         if(Objects.isNull(user)||Objects.nonNull(user.getName())){

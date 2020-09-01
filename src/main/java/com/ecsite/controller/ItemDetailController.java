@@ -28,12 +28,23 @@ public class ItemDetailController {
     @Autowired
     private UserService userService;
 
+    
+    /** 
+     * @return ItemDetailForm
+     */
     @ModelAttribute
 	public ItemDetailForm setUpForm() {
 		return new ItemDetailForm();
 	}
 
 
+    
+    /** 
+     * itemの詳細ページを表示
+     * @param model
+     * @param itemId
+     * @return String
+     */
     @RequestMapping("/showDetail")
     public String itemDetail(Model model,String itemId){
         Item item=itemService.findById(Integer.parseInt(itemId));

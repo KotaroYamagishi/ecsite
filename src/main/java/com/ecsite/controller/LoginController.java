@@ -12,6 +12,9 @@ import com.ecsite.domain.OrderTopping;
 import com.ecsite.domain.User;
 import com.ecsite.form.LoginForm;
 import com.ecsite.security.LoginUserDetails;
+import com.ecsite.service.OrderItemService;
+import com.ecsite.service.OrderToppingService;
+import com.ecsite.service.OrdersService;
 import com.ecsite.service.ShoppingCartService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +30,47 @@ public class LoginController {
 
     @Autowired
     private ShoppingCartService shoppingCartService;
+    @Autowired
+    private OrdersService ordersService;
+
+    @Autowired
+    private OrderItemService orderItemService;
+
+    @Autowired
+    private OrderToppingService orderToppingService;
 
     @Autowired
     private HttpSession session;
 
+    
+    /** 
+     * @return LoginForm
+     */
     @ModelAttribute
     public LoginForm setUpLoginForm() {
         return new LoginForm();
     }
 
+    
+    /** 
+     * @param model
+     * @param error
+     * @return String
+     */
     @RequestMapping("/toLogin")
-    public String toLogin() {
+    public String toLogin(Model model,String error) {
+        if(Objects.nonNull(error)) {
+			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが違います");
+		}
         return "user/login";
     }
 
+    
+    /** 
+     * @param userDetails
+     * @param model
+     * @return String
+     */
     // もし、guestユーザーが存在しなければ
     // sessionにログインしたアカウントをそのままset
     // もし、guestユーザーが存在すれば（itemをカートに入れる瞬間）orderItemが一つは入っている
@@ -67,27 +97,27 @@ public class LoginController {
             // 未ログインユーザーがアイテムを入れている＆＆loginユーザーがまだカートにitemを入れていない
             if (Objects.isNull(loginUserOrder)) {
                 guestUserOrder.setUserId(loginUser.getId());
-                shoppingCartService.updateUserId(guestUserOrder);
+                ordersService.updateUserId(guestUserOrder);
             } else {
                 List<OrderItem> loginOrderItemList = loginUserOrder.getOrderItemList();
                 // ここのif文いらんかも
                 if (Objects.isNull(loginOrderItemList)) {
                     guestUserOrder.setUserId(loginUser.getId());
-                    shoppingCartService.updateUserId(guestUserOrder);
+                    ordersService.updateUserId(guestUserOrder);
                 } else {
                     List<OrderItem> guestOrderItemList = guestUserOrder.getOrderItemList();
                     guestOrderItemList.forEach(guestOrderItem -> {
                         guestOrderItem.setOrderId(loginUserOrder.getId());
-                        OrderItem findOrderItem = shoppingCartService.findByItemIdAndOrderIdAndSize(guestOrderItem);
+                        OrderItem findOrderItem = orderItemService.findByItemIdAndOrderIdAndSize(guestOrderItem);
                         if (Objects.isNull(findOrderItem)) {
-                            shoppingCartService.OrderIdUpdate(guestOrderItem);
+                            orderItemService.OrderIdUpdate(guestOrderItem);
                         } else {
-                            List<OrderTopping> orderToppingList = shoppingCartService
+                            List<OrderTopping> orderToppingList = orderToppingService
                                     .findByOrderItemId(findOrderItem.getId());
                             if (Objects.isNull(orderToppingList)) {
-                                shoppingCartService.OrderIdUpdate(guestOrderItem);
+                                orderItemService.OrderIdUpdate(guestOrderItem);
                             } else {
-                                List<OrderTopping> guestOrderToppingList = shoppingCartService
+                                List<OrderTopping> guestOrderToppingList = orderToppingService
                                         .findByOrderItemId(guestOrderItem.getId());
                                 List<Integer> guestToppingIdList = guestOrderToppingList.stream()
                                         .map(got -> got.getToppingId()).collect(Collectors.toList());
@@ -96,10 +126,10 @@ public class LoginController {
                                 if (Objects.equals(guestToppingIdList, orderToppingIdList)) {
                                     Integer beforeQuantity = findOrderItem.getQuantity();
                                     findOrderItem.setQuantity(beforeQuantity + guestOrderItem.getQuantity());
-                                    shoppingCartService.quantityUpdate(findOrderItem);
+                                    orderItemService.quantityUpdate(findOrderItem);
                                     shoppingCartService.deleteOrderItemsAndOrdertoppings(guestOrderItem.getId());
                                 } else {
-                                    shoppingCartService.OrderIdUpdate(guestOrderItem);
+                                    orderItemService.OrderIdUpdate(guestOrderItem);
                                 }
                             }
                         }
@@ -107,7 +137,7 @@ public class LoginController {
                     // totalpriceを足さな
                     Integer beforeTotalPrice = loginUserOrder.getTotalPrice();
                     loginUserOrder.setTotalPrice(beforeTotalPrice + guestUserOrder.getTotalPrice());
-                    shoppingCartService.totalPriceUpdate(loginUserOrder);
+                    ordersService.totalPriceUpdate(loginUserOrder);
                     // ordertableにloginユーザーと未ログインユーザの重複を避けるため
                     shoppingCartService.deleteOrders(guestUserOrder.getId());
                 }
@@ -117,14 +147,23 @@ public class LoginController {
         return "forward:/item-list";
     }
 
+    
+    /** 
+     * @return String
+     */
     @RequestMapping("/logout/success")
     public String logout() {
         session.removeAttribute("user");
         return "forward:/item-list";
     }
 
+    
+    /** 
+     * @param order
+     * @return Order
+     */
     private Order findOrder(Order order) {
-        List<Order> findOrderList = shoppingCartService.findOrdersAndOrderItemAndOrderTopping(order);
+        List<Order> findOrderList = ordersService.findOrdersAndOrderItemAndOrderTopping(order);
         Order findOrder = new Order();
         if (findOrderList.size() == 0) {
             findOrder = null;

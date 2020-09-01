@@ -28,47 +28,17 @@ public class ShoppingCartService {
     private ToppingService toppingService;
     @Autowired
     private OrderItemRepository orderItemRepository;
-
     @Autowired
     private OrderToppingRepository orderToppingRepository;
 
 
-    public List<Order> findOrdersAndOrderItemAndOrderTopping(Order order) {
-        return ordersRepository.findOrdersAndOrderItemAndOrderTopping(order);
-    }
 
-    public void applyOrder(Order order,Integer status){
-        ordersRepository.applyOrder(order,status);
-    }
-
-    public void updateUserId(Order order){
-        ordersRepository.updateUserId(order);
-    }
-
-    public void OrderIdUpdate(OrderItem orderItem){
-        orderItemRepository.orderIdUpdate(orderItem);
-    }
-
-    public void totalPriceUpdate(Order order){
-        ordersRepository.totalPriceUpdate(order);
-    }
-
-    public OrderItem findByItemIdAndOrderIdAndSize(OrderItem orderItem){
-        return orderItemRepository.findByItemIdAndOrderIdAndSize(orderItem);
-    }
-
-    public List<OrderTopping> findByOrderItemId(Integer itemId){
-        return (List<OrderTopping>) orderToppingRepository.findByOrderItemId(itemId);
-    }
-
-    public void quantityUpdate(OrderItem orderItem){
-        orderItemRepository.quantityUpdate(orderItem);
-    }
-
-    public OrderTopping findByOrderItemIdAndToppingId(OrderTopping orderTopping){
-        return orderToppingRepository.findByOrderItemIdAndToppingId(orderTopping);
-    }
-
+    
+    /** 
+     * ショッピングカートに商品を追加する
+     * @param order
+     * @param orderItem
+     */
     // orderにはuserId,status,totalPrice
     // orderItemにはitemId,quantity,size,初回insert時はorderのinsert時に取得する自動採番の値をorderIdにsetする
     public void addShoppingCart(Order order,OrderItem orderItem){
@@ -108,10 +78,21 @@ public class ShoppingCartService {
         }
     }
 
+    
+    /** 
+     * orderidを元に該当するordersの情報を削除
+     * 
+     * @param orderId
+     */
     public void deleteOrders(Integer orderId){
         ordersRepository.delete(orderId);
     }
 
+    
+    /** 
+     * orderItemIdをもとにorderItemsとorderToppingの情報を削除
+     * @param orderItemId
+     */
     public void deleteOrderItemsAndOrdertoppings(Integer orderItemId){
         OrderItem orderItem=orderItemRepository.findById(orderItemId);
         List<OrderTopping> orderToppingList = (List<OrderTopping>) orderToppingRepository
@@ -126,6 +107,11 @@ public class ShoppingCartService {
         orderItemRepository.delete(orderItemId);
     }
 
+    
+    /** 
+     * 
+     * @param orderItem
+     */
     // orderItemクラスの中にあるItemプロパティと、その中にあるorderToppingListのToppingプロパティを詰める
     public void orderItemSetItemAndTopping(OrderItem orderItem){
         Item item = itemService.findById(orderItem.getItemId());
@@ -157,6 +143,11 @@ public class ShoppingCartService {
     }
 
 
+    
+    /** 
+     * はじめてショッピングカートに商品をinsert
+     * @param orderItem
+     */
     private void orderItemAndOrderItemToppingFirstInsert(OrderItem orderItem){
         orderItemRepository.firstInsert(orderItem);
         Integer orderItemId=orderItem.getId();

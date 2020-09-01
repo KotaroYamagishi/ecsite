@@ -13,11 +13,10 @@ import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.P
 
 // repositoryの代わり
 @Mapper
-public interface ItemRepository{
+public interface ItemRepository {
 
-    Collection<Item> findAll(
-        @Param("itemSearchForm")ItemSearchForm itemSearchForm
-        ,@Param("pageable")Pageable pageable);
+    Collection<Item> findAll(@Param("itemSearchForm") ItemSearchForm itemSearchForm,
+            @Param("pageable") Pageable pageable);
 
     @Select("select * from items where id=#{id}")
     Item findById(Integer itemId);

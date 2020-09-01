@@ -22,6 +22,12 @@ public class LoginService implements UserDetailsService {
 	@Autowired
 	private UserRepository usersRepository;
 
+	
+	/** 
+	 * @param email
+	 * @return UserDetails
+	 * @throws UsernameNotFoundException
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		if (email == null || "".equals(email)) {
@@ -34,6 +40,11 @@ public class LoginService implements UserDetailsService {
 		return new LoginUserDetails(user, getAuthorities(user));
 	}
 
+	
+	/** 
+	 * @param user
+	 * @return Collection<GrantedAuthority>
+	 */
 	private Collection<GrantedAuthority> getAuthorities(User user) {
 		return AuthorityUtils.createAuthorityList("ROLE_USER");
 	}

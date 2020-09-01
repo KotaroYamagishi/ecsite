@@ -41,7 +41,7 @@
 						</span>
 						<span th:if="${user}">
 							<span style="color:blue;font-color:white;">ログイン中</span>
-							<a th:href="@{/logout}" class="navbar-link">ログアウト</a>
+							<a th:href="@{/logout}" class="navbar-link" style="color:red">ログアウト</a>
 						</span>
 					</p>
 				</div>
@@ -218,11 +218,12 @@
 									<div class="form-group">
 										<div class="row">
 											<div class="col-sm-12">
+												<div th:text="${errorMessage}" style="color: red"></div>
 												<span th:if="${#fields.hasErrors('deliveryTime')}" th:errors="*{deliveryTime}" style="color: red"></span>
 											</div>
 											<div class="col-sm-5">
 												<input type="date" name="deliveryTime" id="deliveryTime"
-													class="form-control input-sm" />
+													class="form-control input-sm" th:value="${nowDate}"/>
 											</div>
 
 										</div>

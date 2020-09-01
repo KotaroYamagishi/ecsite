@@ -4,7 +4,9 @@
     <select id="findAll" resultType="com.ecsite.domain.Item">
         select * 
         from items
+        <if test="itemSearchForm.searchName!=null">
         where name like '%' || #{itemSearchForm.searchName} || '%'
+        </if>
         <if test="itemSearchForm.sort!=null">
         ORDER BY price_m ${itemSearchForm.sort}
         </if>

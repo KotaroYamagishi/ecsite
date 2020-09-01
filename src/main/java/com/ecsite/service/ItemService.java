@@ -23,15 +23,37 @@ public class ItemService {
 
     private String listPageSize="6";
 
+    
+    /** 
+     * itemSearchFormとpageableをもとに、条件に合った商品情報を取得
+     * 
+     * @param itemSearchForm
+     * @param pageable
+     * @return List<Item>
+     */
     public List<Item> findAll(ItemSearchForm itemSearchForm,Pageable pageable) {
         List<Item> itemList= (List<Item>) itemRepository.findAll(itemSearchForm, pageable);
         return itemList;
     }
 
+    
+    /** 
+     * itemのidをもとにitemを検索
+     * 
+     * @param itemId
+     * @return Item
+     */
     public Item findById(Integer itemId){
         return itemRepository.findById(itemId);
     }
 
+    
+    /** 
+     * pageableに情報を詰めるメソッド
+     * 
+     * @param pageNumber
+     * @return Pageable
+     */
     public Pageable getPageable(int pageNumber){
         Pageable pageable = new Pageable() {
             public int getPageNumber() {
@@ -57,6 +79,13 @@ public class ItemService {
         return pageable;
     }
 
+    
+    /**
+     * 全ページ数を取得するページ数
+     *  
+     * @param itemSearchForm
+     * @return int
+     */
     public int getAllPageNum(ItemSearchForm itemSearchForm) {
         //1ページに表示する行数を取得
         int listPageSizeNum = Integer.parseInt(listPageSize);
@@ -72,6 +101,12 @@ public class ItemService {
         return allPageNum == 0 ? 1 : allPageNum;
     }
 
+    
+    /** 
+     * オートコンプリート用の名前だけのlistを取得
+     * 
+     * @return StringBuilder
+     */
     public StringBuilder createItemNameForAutocomplete() {
         List<Item> itemList = (List<Item>) itemRepository.findAll(new ItemSearchForm(), null);
         List<String> originalItemNameList=itemList.stream().map(item->item.getName()).collect(Collectors.toList());

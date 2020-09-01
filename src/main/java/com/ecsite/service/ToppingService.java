@@ -16,10 +16,21 @@ public class ToppingService {
     @Autowired
     private ToppingRepository toppingRepository;
 
+    
+    /** 
+     * toppingの情報を全て取得
+     * @return List<Topping>
+     */
     public List<Topping> findAll(){
         return toppingRepository.findAll();
     }
 
+    
+    /** 
+     * toppingのidをもとにtoppingの情報を取得
+     * @param id
+     * @return Topping
+     */
     public Topping findById(Integer id){
         return toppingRepository.findById(id);
     }
